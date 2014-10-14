@@ -15,20 +15,27 @@ parser.add_option("-c", "--no-comments", action = "store_true", dest="ignore_com
                   help="Don\'t count lines that have Cstyle or Pythonstyle comments.")
 parser.add_option("-d", "--dir", action = "store", type = "string", dest="input_directory", 
                   help="Directory to count")
-        
+
 class FileCount:
     def __init__(self, ignore_comment, ignore_empty):
         self.found_files = []
         self.ignore_comment = ignore_comment;
         self.ignore_empty = ignore_empty;
-    
+
     def file_len(self, fname):
         with open(fname) as f:
             count = 0;
             for line in f:
+                line = line.strip()
+                if self.ignore_comment:
+                    if line.startswith('#') or line.startswith('//'):
+                        continue 
+                if self.ignore_empty:
+                    if not(len(line)):
+                        continue
                 count += 1
         return count
-    
+
     def get_files(self, input_dir):
         files = os.listdir(input_dir)
         for item in files:
@@ -39,7 +46,7 @@ class FileCount:
             elif os.path.isfile(item):
                 filepath = os.path.normpath(item)
                 self.found_files.append(filepath)
-    
+
     def count(self, input_dir):
         self.get_files(input_dir)
         for f in self.found_files:
@@ -65,5 +72,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-   
